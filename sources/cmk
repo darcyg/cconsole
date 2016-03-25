@@ -1,0 +1,17 @@
+#!/bin/bash
+
+__source_d=../sources
+__build_d=../build
+__build_t=Debug
+
+
+if [ ! -d "${__build_d}" ]
+then
+  mkdir -p "${__build_d}"
+
+fi
+
+cd ${__build_d}
+cmake -DCMAKE_BUILD_TYPE=${__build_t} -G "Unix Makefiles" ${__source_d}
+make
+
