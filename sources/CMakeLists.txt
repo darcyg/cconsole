@@ -12,7 +12,7 @@ file (GLOB __unit_tests_sources "tests/unit/*.cpp")
 
 
 set (CXX_STANDARD "-std=c++11")
-set (CXX_COMMON_FLAGS "${CXX_STANDARD} -Wall -Wextra -Wdeprecated -pedantic -isystem ${BOOST_HOME}/include")
+set (CXX_COMMON_FLAGS "${CXX_STANDARD} -Wall -Wextra -Wdeprecated -pedantic -isystem ${BOOST_HOME}/include -isystem ${BOOGLE_TEST_HOME}/include")
 set (CMAKE_CXX_FLAGS_DEBUG   "${CXX_COMMON_FLAGS} -O0 -g3 -pg")
 set (CMAKE_CXX_FLAGS_RELEASE "${CXX_COMMON_FLAGS} -O3")
 
