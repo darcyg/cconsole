@@ -1,0 +1,16 @@
+#!/bin/bash
+
+__build_d=../build
+__test_t="${1:2}"
+if [ "${__test_t}" == "" -o "${__test_t}" == "unit" ]
+then
+  ${__build_d}/unit_tests
+
+#else if [ "${__test_t}" == "integration" ]
+#then
+#  ${__build_d}/integration_tests
+else
+  echo "unknow test type: ${__test_t}"
+  exit 1
+fi
+

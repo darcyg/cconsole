@@ -8,7 +8,7 @@ project (unit_tests)
 
 file (GLOB __cview_sources "cview/*.cpp")
 file (GLOB __cmonitor_sources  "cmonitor/*.cpp")
-file (GLOB __unit_tests_sources "test/units/*.cpp")
+file (GLOB __unit_tests_sources "tests/unit/*.cpp")
 
 
 set (CXX_STANDARD "-std=c++11")
