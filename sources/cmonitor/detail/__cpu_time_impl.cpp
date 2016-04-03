@@ -19,6 +19,18 @@ std::size_t crf::proc::detail::cpu_total_of(std::string const& cpu_stat_line) {
   return total;
 }
 
+
+namespace {
+static inline std::size_t jump_many(std::string const& str, std::size_t const start_posn, int const from, int const to) {
+  auto posn = start_posn;
+  for( auto i = from; i < to; ++i ) {
+    posn = str.find_first_not_of( ' ', posn+1 );
+    posn = str.find( ' ', posn+1 );
+  }
+  return posn;
+}
+} // namespace
+
 crf::proc::detail::proc_stat crf::proc::detail::make_proc_stat(std::string const& proc_stat_line) {
   /// PID (command) S  
   /// man proc | less
@@ -27,12 +39,7 @@ crf::proc::detail::proc_stat crf::proc::detail::make_proc_stat(std::string const
   auto const state = proc_stat_line[state_b]; 
   auto const state_e = state_b + 1;
 
-  auto posn = state_e;
-  for( auto i = 3; i < 13; ++i ) {
-    posn = proc_stat_line.find_first_not_of( ' ', posn+1 );
-    posn = proc_stat_line.find( ' ', posn+1 );
-  }
-
+  auto posn = ::jump_many( proc_stat_line, state_e, 3, 13 );
   auto const utime_b = proc_stat_line.find_first_not_of( ' ', posn );
   auto const utime_e = proc_stat_line.find( ' ', utime_b+1 );
   auto const utime   = boost::lexical_cast<std::size_t>(proc_stat_line.substr( utime_b, utime_e-utime_b ));
@@ -41,7 +48,13 @@ crf::proc::detail::proc_stat crf::proc::detail::make_proc_stat(std::string const
   auto const stime_e = proc_stat_line.find( ' ', stime_b );
   auto const stime   = boost::lexical_cast<std::size_t>(proc_stat_line.substr( stime_b, stime_e-stime_b ));
 
-  return { state, utime, stime };
+
+  posn = ::jump_many( proc_stat_line, stime_e, 15, 19 );
+  auto const num_thread_b = proc_stat_line.find_first_not_of( ' ', posn );
+  auto const num_thread_e = proc_stat_line.find( ' ', num_thread_b+1 );
+  auto const num_thread   = boost::lexical_cast<std::size_t>(proc_stat_line.substr( num_thread_b, num_thread_e-num_thread_b ));
+
+  return { state, utime, stime, num_thread };
 }
 
 crf::proc::detail::cpu_time crf::proc::detail::make_cpu_time(std::string const& cpu_stat_line, std::string const& proc_stat_line) {

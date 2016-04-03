@@ -15,6 +15,7 @@ struct proc_stat {
   char state;
   std::size_t utime;
   std::size_t stime;
+  std::size_t num_thread;
 };
 
 std::size_t cpu_total_of(std::string const& cpu_stat_line) __attribute__((flatten));
