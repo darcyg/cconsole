@@ -6,9 +6,9 @@ __build_t=Debug
 
 if [ "$1" == "-c" -o "$1" == "--clean" ]
 then
-  shift 1
+  shift
   rm -rf "${__build_d}"
-  exit 0
+
 fi
 
 
@@ -20,5 +20,5 @@ fi
 
 cd ${__build_d}
 cmake -DGOOGLE_TEST_HOME=${GOOGLE_TEST_HOME} -DBOOST_HOME=${BOOST_HOME} -DCMAKE_BUILD_TYPE=${__build_t} -G "Unix Makefiles" ${__source_d}
-make
+make $1
 
