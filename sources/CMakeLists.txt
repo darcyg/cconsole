@@ -6,7 +6,7 @@ project (unit_tests)
 
 file (GLOB __cview_sources "cview/*.cpp")
 file (GLOB __cmonitor_sources  "cmonitor/*.cpp")
-file (GLOB __unit_tests_sources "tests/unit/*.cpp")
+file (GLOB __unit_tests_sources "tests/unit/*.cpp" "tests/unit/cconsole/*.cpp" "tests/unit/cmonitor/*.cpp")
 
 
 set (CXX_STANDARD "-std=c++14")
@@ -35,5 +35,5 @@ add_executable (cmonitor  ${__cmonitor_sources})
 target_link_libraries (cmonitor ccmonitor boost_system pthread)
 
 add_executable (unit_tests ${__unit_tests_sources})
-target_link_libraries (unit_tests gtest pthread)
+target_link_libraries (unit_tests ccmonitor gtest pthread)
 

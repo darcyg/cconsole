@@ -2,9 +2,10 @@
 
 __build_d=../build
 __test_t="${1:2}"
+__bin_d=${__build_d}/bin
 if [ "${__test_t}" == "" -o "${__test_t}" == "unit" ]
 then
-  ${__build_d}/unit_tests
+  ${__bin_d}/unit_tests
 
 #else if [ "${__test_t}" == "integration" ]
 #then

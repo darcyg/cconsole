@@ -1,11 +1,14 @@
 /// __monitor.hpp
 #pragma once
 #include <cconsole/sample.hpp>
+#include <boost/format.hpp>
 
 namespace crf { namespace proc {
 class monitor {
 public:
   using sample_t = crf::proc::sample;
+
+  static boost::format _stat_file_format;
 
   explicit monitor(pid_t const pid) noexcept;
   sample_t sample() const;
