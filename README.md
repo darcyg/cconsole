@@ -10,8 +10,8 @@ CConsole is a monitoring application for viewing resource usage of processes (al
 
 ### Requirements ###
 The build requires the following envvars to be set in the building environment
-* BOOST_HOME: full path to the directory holding include and lib for Boost library (1.59+)
-* GOOGLE_TEST_HOME: full path to the built googletest library
+* ***BOOST_HOME***: full path to the directory holding include and lib for Boost library (1.59+)
+* ***GOOGLE_TEST_HOME***: full path to the built googletest library
 
 ### Build procedure ###
 Under /path/to/sources issue the following command:
