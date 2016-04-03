@@ -7,6 +7,7 @@ CConsole is a monitoring application for viewing resource usage of processes (al
 ### Dependencies ###
 * [Boost](http://www.boost.org/) 1.59
 * [googletest](https://github.com/google/googletest) version at 2016.03.30
+* [CMake](https://cmake.org/) 2.8.12 or newer
 
 ### Requirements ###
 The build requires the following envvars to be set in the building environment
@@ -25,3 +26,4 @@ Which will build all targets and place them under /path/to/sources/../build
 
 ## Contact ##
 * iszekeres.x@gmail.com
+
