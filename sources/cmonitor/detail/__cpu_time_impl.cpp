@@ -22,13 +22,13 @@ std::size_t crf::proc::detail::cpu_total_of(std::string const& cpu_stat_line) {
 crf::proc::detail::proc_stat crf::proc::detail::make_proc_stat(std::string const& proc_stat_line) {
   /// PID (command) S  
   /// man proc | less
-  auto state_b = proc_stat_line.find( ')' );
+  auto state_b = proc_stat_line.find( ')' ) + 1;
   state_b = proc_stat_line.find_first_not_of( ' ', state_b );
   auto const state = proc_stat_line[state_b]; 
   auto const state_e = state_b + 1;
 
   auto posn = state_e;
-  for( auto i = 3; i < 14; ++i ) {
+  for( auto i = 3; i < 13; ++i ) {
     posn = proc_stat_line.find_first_not_of( ' ', posn+1 );
     posn = proc_stat_line.find( ' ', posn+1 );
   }

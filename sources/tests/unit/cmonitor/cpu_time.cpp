@@ -20,8 +20,38 @@ TEST(libccmonit_cpu_time, make_proc_stat) {
   /// (15) stime
   /// ..
   /// (20) num_thread
+  ///
+  ///                       1   2    3 4 5 6 7  8    9     10     11    12 13  14 15  16  17  18...20 .. 
   auto const proc1_stat  = "1 (init) S 0 1 1 0 -1 4219136 73532 1104501 31 921 43 76 1562 675 20 0 1 0 3 34992128 871 18446744073709551615 1 1 0 0 0 0 0 4096 536962595 0 0 0 17 3 0 0 111 0 0 0 0 0 0 0 0 0 0";
-  auto const proc77_stat = "77 (kswapd0) S 2 0 0 0 -1 10758208 0 0 0 0 0 0 0 0 20 0 1 0 58 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 0 0 0 17 5 0 0 0 0 0 0 0 0 0 0 0 0 0";
-  auto const proc78_stat = "78 (vmstat) S 2 0 0 0 -1 69247072 0 0 0 0 0 0 0 0 0 -20 1 0 58 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 0 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 0";
+  ///                       1     2      3 4 5 6 7  8    9    10 1112 13 1415  16 ...    20 .. 
+  auto const proc77_stat = "77 (kswapd0) S 2 0 0 0 -1 10758208 0 0 0 1111 0 0 22222 0 20 0 1 0 58 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 0 0 0 17 5 0 0 0 0 0 0 0 0 0 0 0 0 0";
+  ///                       1     2      3 4 5 6 7  8    9    10 1112 13 14 15  16 ...    20 .. 
+  auto const proc78_stat = "77 (kswapd0) S 2 0 0 0 -1 10758208 0 0 0 1111 0 13 22222 0 20 0 1 0 58 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 0 0 0 17 5 0 0 0 0 0 0 0 0 0 0 0 0 0";
+  ///                       1     2      3 4 5 6 7  8    9    10 1112 13 14 15  16 ...    20 .. 
+  auto const proc79_stat = "77 (kswapd0) S 2 0 0 0 -1 10758208 0 0 0 1111 7 0 22222 0 20 0 1 0 58 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 0 0 0 17 5 0 0 0 0 0 0 0 0 0 0 0 0 0";
+  {
+    auto const proc_stat = crf::proc::detail::make_proc_stat(proc1_stat);
+    EXPECT_EQ(proc_stat.state, 'S');
+    EXPECT_EQ(proc_stat.utime, 43u);
+    EXPECT_EQ(proc_stat.stime, 76u);
+  }
+  {
+    auto const proc_stat = crf::proc::detail::make_proc_stat(proc77_stat);
+    EXPECT_EQ(proc_stat.state, 'S');
+    EXPECT_EQ(proc_stat.utime, 0u);
+    EXPECT_EQ(proc_stat.stime, 0u);
+  }
+  {
+    auto const proc_stat = crf::proc::detail::make_proc_stat(proc78_stat);
+    EXPECT_EQ(proc_stat.state, 'S');
+    EXPECT_EQ(proc_stat.utime, 0u);
+    EXPECT_EQ(proc_stat.stime, 13u);
+  }
+  {
+    auto const proc_stat = crf::proc::detail::make_proc_stat(proc79_stat);
+    EXPECT_EQ(proc_stat.state, 'S');
+    EXPECT_EQ(proc_stat.utime, 7u);
+    EXPECT_EQ(proc_stat.stime, 0u);
+  }
 }
 
