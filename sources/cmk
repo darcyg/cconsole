@@ -3,6 +3,7 @@
 __source_d=../sources
 __build_d=../build
 __build_t=Debug
+__bin_d=${__build_d}/bin
 
 if [ "$1" == "-c" -o "$1" == "--clean" ]
 then
@@ -14,11 +15,11 @@ fi
 
 if [ ! -d "${__build_d}" ]
 then
-  mkdir -p "${__build_d}"
+  mkdir -p "${__bin_d}"
 
 fi
 
 cd ${__build_d}
-cmake -DGOOGLE_TEST_HOME=${GOOGLE_TEST_HOME} -DBOOST_HOME=${BOOST_HOME} -DCMAKE_BUILD_TYPE=${__build_t} -G "Unix Makefiles" ${__source_d}
+cmake -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${__bin_d} -DGOOGLE_TEST_HOME=${GOOGLE_TEST_HOME} -DBOOST_HOME=${BOOST_HOME} -DCMAKE_BUILD_TYPE=${__build_t} -G "Unix Makefiles" ${__source_d}
 make $1
 

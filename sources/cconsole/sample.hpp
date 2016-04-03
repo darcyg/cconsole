@@ -1,8 +1,9 @@
 /// sample.hpp
 #pragma once
-#include <sys/types.hpp>
+#include <sys/types.h>
+#include <cstdlib>
 
-namespace crf { namespace proc_info {
+namespace crf { namespace proc {
 struct sample {
 public:
   pid_t pid;
@@ -13,6 +14,6 @@ public:
   ///std::size_t rmem;
   ///std::size_t vmem;
 };
-} // namespace proc_info
+} // namespace proc
 } // namespace crf
 
