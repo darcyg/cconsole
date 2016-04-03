@@ -1,6 +1,9 @@
 /// __cpu_time_impl.cpp
+#include <cconsole/detail/__first_line_of.hpp>
+#include <cconsole/detail/__startswith.hpp>
 #include <cmonitor/detail/__cpu_time.hpp>
 #include <boost/lexical_cast.hpp>
+#include <fstream>
 
 std::size_t crf::proc::detail::cpu_total_of(std::string const& cpu_stat_line) {
   auto const first_space = cpu_stat_line.find( ' ' );
@@ -17,19 +20,21 @@ std::size_t crf::proc::detail::cpu_total_of(std::string const& cpu_stat_line) {
 }
 
 crf::proc::detail::proc_stat crf::proc::detail::make_proc_stat(std::string const& proc_stat_line) {
-  // PID 
-  auto const state_b = proc_stat_line.find( '(' ) + 1;
-  auto const state_e = state_b + 1;
+  /// PID (command) S  
+  /// man proc | less
+  auto state_b = proc_stat_line.find( ')' );
+  state_b = proc_stat_line.find_first_not_of( ' ', state_b );
   auto const state = proc_stat_line[state_b]; 
+  auto const state_e = state_b + 1;
 
   auto posn = state_e;
   for( auto i = 3; i < 14; ++i ) {
-    posn = proc_stat_line.find_first_not_of( ' ', posn + 1 );
-    posn = proc_stat_line.find( ' ', posn + 1 );
+    posn = proc_stat_line.find_first_not_of( ' ', posn+1 );
+    posn = proc_stat_line.find( ' ', posn+1 );
   }
 
   auto const utime_b = proc_stat_line.find_first_not_of( ' ', posn );
-  auto const utime_e = proc_stat_line.find( ' ', utime_b + 1 );
+  auto const utime_e = proc_stat_line.find( ' ', utime_b+1 );
   auto const utime   = boost::lexical_cast<std::size_t>(proc_stat_line.substr( utime_b, utime_e-utime_b ));
 
   auto const stime_b = proc_stat_line.find_first_not_of( ' ', utime_e );
@@ -43,5 +48,16 @@ crf::proc::detail::cpu_time crf::proc::detail::make_cpu_time(std::string const& 
   auto const cpu_total = cpu_total_of(cpu_stat_line);
   auto const stat = make_proc_stat(proc_stat_line);
   return { stat.state, cpu_total, stat.utime, stat.stime };
+}
+
+crf::proc::detail::cpu_time crf::proc::make_cpu_time(std::string const& stat_path, std::string const& proc_stat_path) {
+  auto stat_is = std::ifstream{stat_path}; 
+  auto const stat_line = crf::first_line_of(stat_is, [] (auto const& s) noexcept { return crf::startswith( s, "cpu " ); });
+  //if (stat_line.empty()) throw ..
+  auto proc_stat_is = std::ifstream{proc_stat_path};
+  auto const proc_stat_line = crf::first_line_of(proc_stat_is);
+  //if (proc_stat_line.empty()) throw ..
+
+  return crf::proc::detail::make_cpu_time( stat_line, proc_stat_line );
 }
 

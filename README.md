@@ -24,6 +24,23 @@ Under /path/to/sources issue the following command:
 Which will build all targets and place them under /path/to/sources/../build
 
 
+## Process information ##
+CMonitor publishes data (periodically) corresponding to a process identified by its ***PID***. The following data is to be sampled:
+* ***pid***
+* ***start_time***
+* ***state***
+* ***usage*** [%]
+* ***utime*** [jiffies]
+* ***stime*** [jiffies]
+* ***num_thread***
+* ***virtual_memory***  [kB]
+* ***resident_memory*** [kB]
+
+This data is obtained from the following sources:
+* ***/proc/stat***: cpu total 
+* ***/proc/$pid/status***: memory specific data
+* ***/proc/$pid/stat***: other
+
 ## Contact ##
 * iszekeres.x@gmail.com
 

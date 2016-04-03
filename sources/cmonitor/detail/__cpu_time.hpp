@@ -21,6 +21,9 @@ std::size_t cpu_total_of(std::string const& cpu_stat_line) __attribute__((flatte
 proc_stat make_proc_stat(std::string const& proc_stat_line) __attribute__((flatten));
 cpu_time make_cpu_time(std::string const& cpu_stat_line, std::string const& proc_stat_line) __attribute__((flatten));
 } // namespace detail
+
+
+detail::cpu_time make_cpu_time(std::string const& stat_path, std::string const& proc_stat_path) __attribute__((flatten));
 } // namespace proc
 } // namespace crf
 
