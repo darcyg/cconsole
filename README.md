@@ -3,6 +3,7 @@
 ## Overview ##
 
 CConsole is a monitoring application for viewing resource usage of processes (already running or to be run).
+
 ***PLAN***: It would be composed of a monitoring process (cmonitor) monitoring a list of id-s of processes (an id
 could be a pid of a running process to "attach" to or a path to a binary to run to). CMonitor would log the 
 target file paths to the console and the samples to these target files. CParse would be a cli parser tool to
