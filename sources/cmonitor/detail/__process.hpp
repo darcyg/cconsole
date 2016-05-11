@@ -7,6 +7,9 @@ namespace crf { namespace proc {
 namespace detail {
 std::string __cmdline_path_of(pid_t pid) noexcept;
 std::string __stringify(int __errno);
+bool __has_started(pid_t pid) noexcept;
+
+void __handle_forked(pid_t pid, std::string const& cmdline);
 } // namespace detail
 
 std::string cmdline_of(pid_t pid);

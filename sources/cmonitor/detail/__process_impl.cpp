@@ -11,14 +11,35 @@
 #include <chrono>
 #include <thread>
 
+#include <sys/types.h>
+#include <sys/wait.h>
 
-pid_t crf::proc::start(std::string const& cmdline) {
-  auto const pid = ::fork();
+
+void crf::proc::detail::__handle_forked(pid_t pid, std::string const& cmdline) {
   if( pid == 0 ) //we are in child..
   {
     ::execlp(cmdline.c_str(), cmdline.c_str());
+    ///see: man 2 execve
     throw std::system_error{errno, std::system_category()}; 
   }
+  else if( pid == -1 )
+    throw std::system_error{errno, std::system_category()};
+
+  if (not detail::__has_started(pid))
+    throw std::system_error{ECHILD, std::system_category()};
+}
+
+bool crf::proc::detail::__has_started(pid_t pid) noexcept {
+  static auto _proc_path_format = boost::format{"/proc/%1%"};
+  using namespace boost::filesystem;
+
+  auto const path = ( _proc_path_format % pid ).str();
+  return( exists(path) and is_directory(path) );
+}
+
+pid_t crf::proc::start(std::string const& cmdline) {
+  auto const pid = ::fork();
+  crf::proc::detail::__handle_forked(pid, cmdline);
   return pid;
 }
 
@@ -61,8 +82,13 @@ void crf::proc::kill(pid_t pid) {
   if (pid == -1)
     throw std::invalid_argument{"pid: -1 -- cannot issue kill for all processes"};
 
-  ///TODONE: check output and signal error
-  ::kill(pid, SIGKILL);
+  ///see: man 3 kill
+  auto const retval = ::kill(pid, SIGKILL);
+  if( retval == -1 )
+    throw std::system_error{errno, std::system_category()};
+
+  auto status = 0;
+  ::waitpid(pid, &status, 0);
 }
 
 bool crf::proc::is_alive(pid_t pid, std::string cmdline) noexcept {

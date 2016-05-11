@@ -47,6 +47,8 @@ monitor::monitor(pid_t const pid, std::string const& cmdline, bool const is_owne
 : _dsc_ptr{std::make_unique<__descriptor>(pid, cmdline)}
 , _owner{is_owner}
 {
+  if( _owner )
+    _guard.emplace(_dsc_ptr->pid);
 }
 
 monitor::monitor(pid_t const pid, bool const is_owner) : monitor(pid, crf::proc::cmdline_of(pid), is_owner)

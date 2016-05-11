@@ -19,8 +19,7 @@ void do_some_heavy_calculation(long iterations = 130l) noexcept {
 }
 } // namespace 
 
-int main(int argc, char * argv[]) {
-  //auto i = 130;
+int main(void) {
   while (true)
   {
      auto timeout = 1300;

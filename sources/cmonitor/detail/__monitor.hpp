@@ -1,10 +1,13 @@
 /// __monitor.hpp
 #pragma once
+#include <cmonitor/detail/__proc_guard.hpp>
 #include <boost/noncopyable.hpp>
 #include <cconsole/sample.hpp>
+#include <boost/optional.hpp>
 #include <boost/format.hpp>
 #include <chrono>
 #include <memory>
+
 
 namespace crf { namespace proc {
 class monitor : private boost::noncopyable {
@@ -28,6 +31,7 @@ public:
   explicit operator bool () const noexcept;
 
 private:
+  using optional_guard_t = boost::optional<crf::proc::guard>;
   struct __descriptor;
 
   monitor(pid_t const pid, std::string const& cmdline, bool const is_owner);
@@ -36,6 +40,7 @@ private:
   std::unique_ptr<__descriptor> _dsc_ptr;
   bool _owner;
 
+  optional_guard_t _guard;
 };
 } // namespace proc
 } // namespace crf
