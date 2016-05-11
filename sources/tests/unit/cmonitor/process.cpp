@@ -9,7 +9,6 @@
 
 #include <cstdio>
 
-/*
 TEST(process, management)
 {
   static auto _fail_message_format = boost::format{"[error] %1%"};
@@ -35,12 +34,7 @@ TEST(process, management)
     ///we wait for exec() to load the new image in the child process..
     auto const parent_cmdline  = crf::proc::cmdline_of(ppid);
     EXPECT_FALSE(parent_cmdline.empty());
-    do
-    {
-      std::this_thread::sleep_for(std::chrono::nanoseconds{210});
-      cmdline = crf::proc::cmdline_of(pid);
-    }
-    while (cmdline.empty() or ( cmdline == parent_cmdline ));
+    cmdline = crf::proc::cmdline_of(pid);
 
     EXPECT_FALSE(cmdline.empty());
     ASSERT_NE(cmdline, parent_cmdline);
@@ -55,5 +49,4 @@ TEST(process, management)
 
   EXPECT_FALSE(crf::proc::is_alive(pid, cmdline));
 }
-*/
 

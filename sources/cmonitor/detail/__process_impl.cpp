@@ -5,22 +5,24 @@
 #include <boost/format.hpp>
 #include <system_error>
 #include <stdexcept>
-#include <signal.h>
 #include <fstream>
+#include <cstdlib>
 
 #include <chrono>
 #include <thread>
 
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 
 void crf::proc::detail::__handle_forked(pid_t pid, std::string const& cmdline) {
   if( pid == 0 ) //we are in child..
   {
-    ::execlp(cmdline.c_str(), cmdline.c_str());
+    ::execlp(cmdline.c_str(), cmdline.c_str(), nullptr);
     ///see: man 2 execve
-    throw std::system_error{errno, std::system_category()}; 
+    ///see: man vfork
+    std::_Exit(2);
   }
   else if( pid == -1 )
     throw std::system_error{errno, std::system_category()};
@@ -38,7 +40,7 @@ bool crf::proc::detail::__has_started(pid_t pid) noexcept {
 }
 
 pid_t crf::proc::start(std::string const& cmdline) {
-  auto const pid = ::fork();
+  auto const pid = ::vfork();
   crf::proc::detail::__handle_forked(pid, cmdline);
   return pid;
 }
