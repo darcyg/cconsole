@@ -1,39 +1,42 @@
 /// __monitor.hpp
 #pragma once
+#include <boost/noncopyable.hpp>
 #include <cconsole/sample.hpp>
 #include <boost/format.hpp>
 #include <chrono>
+#include <memory>
 
 namespace crf { namespace proc {
-class monitor {
+class monitor : private boost::noncopyable {
 public:
   using sample_t = crf::proc::sample;
 
-  /// to obtain cpu total from
-  static auto constexpr _stat_file = "/proc/stat";
-  static std::string const _stat_path;
-  /// to obtain memory consumption data from
-  static boost::format  _proc_status_file_format;
-  /// to obtain runtime info from -- stime, utime, state
-  static boost::format  _proc_stat_file_format;
   static auto constexpr _default_parse_interval = std::chrono::milliseconds{100};
 
+
   explicit monitor(pid_t const pid);
+  explicit monitor(std::string const& cmdline);
   sample_t sample(std::chrono::milliseconds const parse_interval = _default_parse_interval) const;
 
+  pid_t pid() const noexcept;
+  bool is_owner() const noexcept;
+  bool is_process_alive() const noexcept;
+  void detach() noexcept;
+  void kill();
+
+  ///effectively is_not_detached() == pid > 0
+  explicit operator bool () const noexcept;
+
 private:
-  pid_t _pid;
-  std::string _proc_stat_path;
-  std::string _proc_status_path;
+  struct __descriptor;
+
+  monitor(pid_t const pid, std::string const& cmdline, bool const is_owner);
+  monitor(pid_t const pid, bool const is_owner);
+
+  std::unique_ptr<__descriptor> _dsc_ptr;
+  bool _owner;
+
 };
-
-
-inline monitor make_monitor(pid_t const pid) noexcept __attribute__((always_inline)) __attribute__((flatten));
 } // namespace proc
 } // namespace crf
-
-
-inline crf::proc::monitor crf::proc::make_monitor(pid_t const pid) noexcept {
-  return monitor{pid};
-}
 

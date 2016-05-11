@@ -1,7 +1,7 @@
 #!/bin/bash
 
-__source_d=../sources
-__build_d=../build
+__source_d=..
+__build_d=./build
 __build_t=Debug
 __bin_d=${__build_d}/bin
 

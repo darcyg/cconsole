@@ -1,7 +1,7 @@
 /// main.cpp
-#include <iostream>
+#include <cstdio>
 
 int main( void ) {
-  std::cout << "running CMonitor\n";
+  std::printf("running CMonitor\n");
 }
 

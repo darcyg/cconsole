@@ -1,8 +1,8 @@
 #!/bin/bash
 
-__build_d=../build
+__build_d=./build
 __test_t="${1:2}"
-__bin_d=${__build_d}/bin
+__bin_d=${__build_d}/build/bin
 if [ "${__test_t}" == "" -o "${__test_t}" == "unit" ]
 then
   ${__bin_d}/unit_tests

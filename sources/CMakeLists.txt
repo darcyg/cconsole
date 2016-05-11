@@ -1,6 +1,7 @@
 # CMakeLists.txt
 cmake_minimum_required (VERSION 2.8.12.2)
 project (cview)
+project (simplex)
 project (cmonitor)
 project (unit_tests)
 
@@ -17,7 +18,6 @@ set (CMAKE_CXX_FLAGS_RELEASE "${CXX_COMMON_FLAGS} -O3")
 
 add_definitions (-DBOOST_ALL_DYN_LINK)
 
-include_directories ("${PROJECT_SOURCE_DIR}/cconsole")
 include_directories ("${GOOGLE_TEST_HOME}/include")
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${BOOST_HOME}/include")
@@ -32,8 +32,11 @@ add_executable (cview ${__cview_sources})
 #target_link_libraries (cview cconsole)
 
 add_executable (cmonitor  ${__cmonitor_sources})
-target_link_libraries (cmonitor ccmonitor boost_system pthread)
+target_link_libraries (cmonitor ccmonitor boost_system boost_filesystem pthread)
 
 add_executable (unit_tests ${__unit_tests_sources})
-target_link_libraries (unit_tests ccmonitor gtest pthread)
+target_link_libraries (unit_tests ccmonitor gtest boost_system boost_filesystem pthread)
+
+add_executable (simplex "tests/long_runners/simplex.cpp")
+target_link_libraries (simplex m)
 
