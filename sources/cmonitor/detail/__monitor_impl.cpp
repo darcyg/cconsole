@@ -44,7 +44,7 @@ crf::proc::monitor::__descriptor::__descriptor(pid_t pid_, std::string cmdline_)
 }
 
 monitor::monitor(pid_t const pid, std::string const& cmdline, bool const is_owner)
-: _dsc_ptr{std::make_unique<__descriptor>(pid, cmdline)}
+: _dsc_ptr{new __descriptor{pid, cmdline}}
 , _owner{is_owner}
 {
   if( _owner )
@@ -59,7 +59,7 @@ monitor::monitor(pid_t const pid): monitor(pid, false)
 {
 }
 
-monitor::monitor(std::string const& cmdline): monitor(crf::proc::start(cmdline), cmdline, true)
+monitor::monitor(std::string const& cmdline): monitor(crf::proc::start(cmdline), true)
 {
 }
 
@@ -74,6 +74,10 @@ monitor::sample_t monitor::sample(std::chrono::milliseconds const parse_interval
 
 pid_t monitor::pid() const noexcept {
   return _dsc_ptr->pid;
+}
+
+std::string const& monitor::cmdline() const noexcept {
+  return _dsc_ptr->cmdline;
 }
 
 bool monitor::is_owner() const noexcept {
