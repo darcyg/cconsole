@@ -11,8 +11,9 @@ public:
   std::size_t utime;
   std::size_t stime;
 
-  ///std::size_t rmem;
-  ///std::size_t vmem;
+  std::size_t vm_rss;
+  std::size_t vm_size;
+  std::size_t vm_peak;
 };
 } // namespace proc
 } // namespace crf

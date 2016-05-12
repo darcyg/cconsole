@@ -1,4 +1,5 @@
 /// __monitor_impl.cpp
+#include <cmonitor/detail/__memory_usage.hpp>
 #include <cmonitor/detail/__cpu_time.hpp>
 #include <cmonitor/detail/__process.hpp>
 #include <cmonitor/detail/__monitor.hpp>
@@ -72,6 +73,7 @@ monitor::sample_t monitor::sample(std::chrono::milliseconds const parse_interval
     throw std::domain_error{"process is not running"};
 
   auto const cpu_info_1 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
+  auto const mem_info   = crf::proc::make_memory_info(_dsc_ptr->proc_status_path); 
   std::this_thread::sleep_for(parse_interval);
   auto const cpu_info_2 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
 

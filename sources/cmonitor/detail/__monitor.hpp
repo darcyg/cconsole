@@ -14,7 +14,7 @@ class monitor : private boost::noncopyable {
 public:
   using sample_t = crf::proc::sample;
 
-  static auto constexpr _default_parse_interval = std::chrono::milliseconds{100};
+  static auto constexpr _default_parse_interval = std::chrono::milliseconds{50};
 
 
   explicit monitor(pid_t const pid);
