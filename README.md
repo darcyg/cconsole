@@ -24,7 +24,8 @@ target file paths to the console and the samples to these target files. CParse w
 
 ### Requirements ###
 
-The build requires the following envvars to be set in the building environment
+The build requires the following envvars to be set in the building environment unless the shared objects / archives reside under /usr/lib and
+the headers under /usr/include.
 * ***BOOST_HOME***: full path to the directory holding include and lib for Boost library (1.59+)
 * ***GOOGLE_TEST_HOME***: full path to the built googletest library
 
