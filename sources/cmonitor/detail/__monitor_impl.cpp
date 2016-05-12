@@ -63,13 +63,20 @@ monitor::monitor(std::string const& cmdline): monitor(crf::proc::start(cmdline),
 {
 }
 
-monitor::sample_t monitor::sample(std::chrono::milliseconds const parse_interval) const {
- auto const cpu_info_1 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
- std::this_thread::sleep_for(parse_interval);
- auto const cpu_info_2 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
+monitor::~monitor() {
+  delete _dsc_ptr;
+}
 
- ///TODONE: collect mem info
- return {};
+monitor::sample_t monitor::sample(std::chrono::milliseconds const parse_interval) const {
+  if (! is_process_alive())
+    throw std::domain_error{"process is not running"};
+
+  auto const cpu_info_1 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
+  std::this_thread::sleep_for(parse_interval);
+  auto const cpu_info_2 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
+
+  ///TODONE: collect mem info
+  return {};
 }
 
 pid_t monitor::pid() const noexcept {
@@ -86,18 +93,6 @@ bool monitor::is_owner() const noexcept {
 
 bool monitor::is_process_alive() const noexcept {
   return crf::proc::is_alive(_dsc_ptr->pid, _dsc_ptr->cmdline);
-}
-
-void monitor::detach() noexcept {
-  _dsc_ptr->pid = 0;
-  _owner = false;
-}
-
-void monitor::kill() {
-  if (! _owner)
-    throw std::domain_error{"cannot kill: monitor does not own the process"};
-
-  crf::proc::kill(_dsc_ptr->pid);
 }
 
 monitor::operator bool () const noexcept {
