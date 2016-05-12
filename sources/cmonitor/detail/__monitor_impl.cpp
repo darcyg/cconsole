@@ -7,6 +7,7 @@
 #include <thread>
 
 using crf::proc::monitor;
+std::chrono::milliseconds constexpr crf::proc::monitor::_default_parse_interval;
 
 struct crf::proc::monitor::__descriptor {
 
@@ -72,13 +73,20 @@ monitor::sample_t monitor::sample(std::chrono::milliseconds const parse_interval
   if (! is_process_alive())
     throw std::domain_error{"process is not running"};
 
-  auto const cpu_info_1 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
+  auto const cpu_time_1 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
   auto const mem_info   = crf::proc::make_memory_info(_dsc_ptr->proc_status_path); 
   std::this_thread::sleep_for(parse_interval);
-  auto const cpu_info_2 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
+  auto const cpu_time_2 = crf::proc::make_cpu_time(__descriptor::_stat_path, _dsc_ptr->proc_stat_path);
+  auto const usage      = crf::proc::cpu_usage_of(cpu_time_1, cpu_time_2);
 
-  ///TODONE: collect mem info
-  return {};
+  ///TODONE: add number of threads support..
+  return { _dsc_ptr->pid
+          ,usage
+          ,cpu_time_2.utime
+          ,cpu_time_2.stime
+          ,mem_info.vm_rss
+          ,mem_info.vm_size
+          ,mem_info.vm_peak };
 }
 
 pid_t monitor::pid() const noexcept {

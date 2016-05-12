@@ -25,6 +25,7 @@ cpu_time make_cpu_time(std::string const& cpu_stat_line, std::string const& proc
 
 
 detail::cpu_time make_cpu_time(std::string const& stat_path, std::string const& proc_stat_path) __attribute__((flatten));
+double cpu_usage_of(detail::cpu_time const& begin, detail::cpu_time const& end) noexcept __attribute__((flatten));
 } // namespace proc
 } // namespace crf
 

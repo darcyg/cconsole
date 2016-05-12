@@ -4,6 +4,7 @@
 #include <cmonitor/detail/__cpu_time.hpp>
 #include <boost/lexical_cast.hpp>
 #include <fstream>
+#include <cmath>
 
 std::size_t crf::proc::detail::cpu_total_of(std::string const& cpu_stat_line) {
   auto const first_space = cpu_stat_line.find( ' ' );
@@ -72,5 +73,15 @@ crf::proc::detail::cpu_time crf::proc::make_cpu_time(std::string const& stat_pat
   //if (proc_stat_line.empty()) throw ..
 
   return crf::proc::detail::make_cpu_time( stat_line, proc_stat_line );
+}
+
+double crf::proc::cpu_usage_of(crf::proc::detail::cpu_time const& begin, crf::proc::detail::cpu_time const& end) noexcept {
+  auto const wall_time_b    = begin.stime + begin.utime;
+  auto const wall_time_e    = end.stime   + end.utime;
+  auto const wall_time_diff = std::abs(wall_time_e - wall_time_b);
+  auto const cpu_total_diff = std::abs(end.total - begin.total);
+
+  auto const usage = (static_cast<double>(wall_time_diff) / cpu_total_diff) * 100.0;
+  return usage;
 }
 

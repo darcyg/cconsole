@@ -3,6 +3,10 @@
 #include <cmonitor/detail/__process.hpp>
 #include <cmonitor/detail/__monitor.hpp>
 #include <gtest/gtest.h>
+#include <thread>
+
+#include <cstdio>
+
 
 TEST(monitor, ownership) {
   ///test owning monitor
@@ -45,4 +49,41 @@ TEST(monitor, ownership) {
   EXPECT_FALSE(crf::proc::is_alive(pid, cmdline));
 }
 
+
+namespace debug {
+static inline void __log(crf::proc::monitor::sample_t const& sample) noexcept {
+  std::printf("\n");
+  std::printf("pid:    %d\n",   sample.pid);
+  std::printf("usage:  %f %\n", sample.cpu_usage);
+  std::printf("utime:  %d\n",   sample.utime);
+  std::printf("stime:  %d\n",   sample.stime);
+  std::printf("VmRSS:  %d\n",   sample.vm_rss);
+  std::printf("VmSize: %d\n",   sample.vm_size);
+  std::printf("VmPeak: %d\n",   sample.vm_peak);
+}
+} // namespace debug
+
+TEST(monitor, samping) {
+  auto const command  = "./build/build/bin/simplex";
+  auto const interval = std::chrono::milliseconds{21};
+  {
+    crf::proc::monitor m{command};
+    EXPECT_TRUE(m.is_process_alive());
+
+    auto attempt = 130;
+    auto sample = crf::proc::monitor::sample_t{};
+    do {
+  
+      auto const prev = sample;
+      sample = m.sample();
+      EXPECT_NE(sample.utime, 0);
+      EXPECT_TRUE(sample.utime >= prev.utime);
+      EXPECT_TRUE(sample.stime >= prev.stime);
+
+      /*debug::__log(sample);*/
+      std::this_thread::sleep_for(interval);
+    }
+    while( --attempt > 0 );
+  }
+}
 

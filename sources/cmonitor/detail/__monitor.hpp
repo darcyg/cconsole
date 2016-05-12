@@ -14,8 +14,7 @@ class monitor : private boost::noncopyable {
 public:
   using sample_t = crf::proc::sample;
 
-  static auto constexpr _default_parse_interval = std::chrono::milliseconds{50};
-
+  static auto constexpr _default_parse_interval = std::chrono::milliseconds{42};
 
   explicit monitor(pid_t const pid);
   explicit monitor(std::string const& cmdline);
@@ -45,5 +44,4 @@ private:
 };
 } // namespace proc
 } // namespace crf
-
 
