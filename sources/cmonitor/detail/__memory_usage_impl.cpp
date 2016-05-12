@@ -37,7 +37,6 @@ crf::proc::detail::memory_info crf::proc::detail::__memory_info_of(std::istream 
   __setattr(stat_stream, line, info.vm_peak, "VmPeak:");
   __setattr(stat_stream, line, info.vm_size, "VmSize:");
   __setattr(stat_stream, line, info.vm_rss,  "VmRSS:");
-  __setattr(stat_stream, line, info.threads, "Threads:");
 
 #undef __setattr
   return info;

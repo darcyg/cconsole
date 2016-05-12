@@ -9,7 +9,6 @@ struct memory_info {
   std::size_t vm_rss;
   std::size_t vm_size;
   std::size_t vm_peak;
-  std::size_t threads;
 
   ///effectively: has meaningful values..
   explicit operator bool () const noexcept __attribute__((always_inline));
@@ -25,7 +24,7 @@ inline detail::memory_info make_memory_info(std::string const& proc_status_path)
 } // namespace crf
 
 inline crf::proc::detail::memory_info::operator bool () const noexcept {
-  return not(( vm_rss == 0u ) or ( vm_size == 0u ) or ( vm_peak == 0u ) or ( threads == 0u ));
+  return not(( vm_rss == 0u ) or ( vm_size == 0u ) or ( vm_peak == 0u ));
 }
 
 inline crf::proc::detail::memory_info crf::proc::make_memory_info(std::string const& proc_status_path) {

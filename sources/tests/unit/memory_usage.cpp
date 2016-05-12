@@ -31,15 +31,13 @@ TEST(memory_usage, __memory_info_of) {
        "VmSize:		12 kb\n"
        "VmLck:		0 kb\n"
        "VmRSS:		12 kb\n"
-       "VmSwap:		0 kb\n"
-       "Threads:		1\n";
+       "VmSwap:		0 kb\n";
 
     std::istringstream iss{status};
     auto const mi = crf::proc::detail::__memory_info_of(iss);
     EXPECT_EQ(mi.vm_peak, 12);
     EXPECT_EQ(mi.vm_size, 12);
     EXPECT_EQ(mi.vm_rss,  12);
-    EXPECT_EQ(mi.threads, 1);
     EXPECT_TRUE(static_cast<bool>(mi));
   }
   {
@@ -47,15 +45,13 @@ TEST(memory_usage, __memory_info_of) {
        "VmPeak:		12 kb\n"
        "VmLck:		0 kb\n"
        "VmRSS:		12 kb\n"
-       "VmSwap:		0 kb\n"
-       "Threads:		1\n";
+       "VmSwap:		0 kb\n";
 
     std::istringstream iss{status};
     auto const mi = crf::proc::detail::__memory_info_of(iss);
     EXPECT_EQ(mi.vm_peak, 12);
     EXPECT_EQ(mi.vm_size, 0);
     EXPECT_EQ(mi.vm_rss,  0);
-    EXPECT_EQ(mi.threads, 0);
     EXPECT_FALSE(static_cast<bool>(mi));
   }
   {
@@ -65,7 +61,6 @@ TEST(memory_usage, __memory_info_of) {
     EXPECT_EQ(mi.vm_peak, 0);
     EXPECT_EQ(mi.vm_size, 0);
     EXPECT_EQ(mi.vm_rss,  0);
-    EXPECT_EQ(mi.threads, 0);
     EXPECT_FALSE(static_cast<bool>(mi));
   }
   {
@@ -73,30 +68,26 @@ TEST(memory_usage, __memory_info_of) {
        "VmPeak:		12 kB\n"
        "VmSize:		12 kB\n"
        "VmLck:		0 kB\n"
-       "VmRSS:		12 kB\n"
        "VmSwap:		0 kB\n";
 
     std::istringstream iss{status};
     auto const mi = crf::proc::detail::__memory_info_of(iss);
     EXPECT_EQ(mi.vm_peak, 12);
     EXPECT_EQ(mi.vm_size, 12);
-    EXPECT_EQ(mi.vm_rss,  12);
-    EXPECT_EQ(mi.threads, 0);
+    EXPECT_EQ(mi.vm_rss,  0);
     EXPECT_FALSE(static_cast<bool>(mi));
   }
   {
     auto const status =
        "VmPeak:		12 kb\n"
        "VmSize:		12 kb\n"
-       "VmRSS:		12 kb\n"
-       "Threads:		1\n";
+       "VmRSS:		12 kb\n";
 
     std::istringstream iss{status};
     auto const mi = crf::proc::detail::__memory_info_of(iss);
     EXPECT_EQ(mi.vm_peak, 12);
     EXPECT_EQ(mi.vm_size, 12);
     EXPECT_EQ(mi.vm_rss,  12);
-    EXPECT_EQ(mi.threads, 1);
     EXPECT_TRUE(static_cast<bool>(mi));
   }
 }
