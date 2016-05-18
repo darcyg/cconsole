@@ -4,6 +4,11 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
+#include <atomic>
+#include <vector>
+#include <thread>
+
+
 TEST(cconsole_tools, startswith) {
   EXPECT_PRED2( crf::startswith, "", "" );
   EXPECT_PRED2( crf::startswith, " ", "" );
@@ -45,5 +50,27 @@ TEST(cconsole_tools, fist_line_of) {
      auto const actual_line = crf::first_line_of( ss, [] (std::string const& line) noexcept { return crf::startswith( line, "cpu10 " ); });
      EXPECT_TRUE(actual_line.empty( ));
   }
+}
+
+TEST(cconsole_tools, join_guard) {
+  auto const N = std::thread::hardware_concurrency();
+  auto threads = std::vector<std::thread>();
+  {
+    auto const volatile guard = crf::make_join_guard(threads);
+    threads.reserve(N);
+    std::atomic<bool> ready{false};
+    auto const spin = [&ready] () noexcept { while (! ready.load(std::memory_order_relaxed)); };
+    for( auto i = 0u; i < N; ++i )
+      threads.emplace_back([&spin, i] () noexcept
+      {
+        spin();
+        auto const volatile r = i+130u;
+      });
+
+    ready.store(true, std::memory_order_relaxed);
+  } // expect to join all threads...
+
+  for( auto&& t : threads )
+    EXPECT_FALSE(t.joinable()); 
 }
 

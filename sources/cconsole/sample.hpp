@@ -2,6 +2,7 @@
 #pragma once
 #include <sys/types.h>
 #include <cstdlib>
+#include <string>
 
 namespace crf { namespace proc {
 struct sample {
@@ -15,6 +16,9 @@ public:
   std::size_t vm_size;
   std::size_t vm_peak;
 };
+
+std::string stringify(crf::proc::sample const& sample); ///TODONE: impl
+crf::proc::sample samplify(std::string const& string);  ///TODONE: impl
 } // namespace proc
 } // namespace crf
 
