@@ -1,25 +1,148 @@
-#!/bin/bash
+#!/bin/python2
+'''
+Build helper which is a wrapper around CMake that configures and runs it then builds the targets 
+specified in CMakeLists.txt with make (as it generates Unix Makefiles at the moment).
 
-__source_d=..
-__build_d=./build
-__build_t=Debug
-__bin_d=${__build_d}/bin
-
-if [ "$1" == "-c" -o "$1" == "--clean" ]
-then
-  shift
-  rm -rf "${__build_d}"
-
-fi
+Please consult ./cmk -h for more information.
 
 
-if [ ! -d "${__build_d}" ]
-then
-  mkdir -p "${__bin_d}"
+Created on 2016.05.16
+@author cvirtue
+'''
+from argparse import ArgumentParser
+from os.path import realpath
+from os.path import abspath
+from os.path import isfile
+from os.path import isdir
+from shutil import rmtree
+import subprocess as sp
+import sys
+import os
 
-fi
 
-cd ${__build_d}
-cmake -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${__bin_d} -DGOOGLE_TEST_HOME=${GOOGLE_TEST_HOME} -DBOOST_HOME=${BOOST_HOME} -DCMAKE_BUILD_TYPE=${__build_t} -G "Unix Makefiles" ${__source_d}
-make $1
+class Targets(object):
+  def __init__(self, source_d, build_d, install_prefix, build_t):
+    self.source_d = source_d
+    self.build_d = build_d
+    self.install_prefix = install_prefix
+    self.build_t = build_t
+    self.bin_d = '/'.join([ build_d, 'bin' ])
+
+
+def build_type_of(args):
+  return( 'Release' if args.release else 'Debug' )
+
+
+def make_targets(args, build_d):
+  source_d = '..'
+  build_t = build_type_of(args)
+  install_prefix = args.install_prefix
+  install_prefix = abspath(install_prefix if install_prefix else build_d)
+  return Targets(source_d, build_d, install_prefix, build_t)
+
+
+def log_debug(message):
+  print '[debug] %s' % message
+
+def log_error(message):
+  print '[error] %s' % message
+
+def log_info(message):
+  print '[info]  %s' % message
+
+
+def toolchains():
+  return [ 'gcc', 'llvm' ]
+
+def args_of(argv, build_d):
+  parser = ArgumentParser(description="A convenience wrapper around CMake for configuration and orchestration of the build procedure..")
+  parser.add_argument('-c', '--clean', help='triggers reconfigure and forces rebuild', action='store_true')
+  parser.add_argument('--install-prefix', type=str, help='deprecated -- does nothing -- do not use')
+  parser.add_argument('-r', '--release', action='store_true', help='triggers a (heavily) optimised build')
+  parser.add_argument('-v', '--verbose', action='store_true', help='triggers verbose compilation')
+  parser.add_argument('-t', '--toolchain', help='sets the toolchain to build the project with', default='gcc', type=str, choices=toolchains())
+  return parser.parse_args(argv)
+
+
+def cpu_is_64bit():
+  return( sys.maxsize > 2**32 )
+
+def cpu_has_DCAS_support():
+  # on linux check the flags section in /proc/cpuinfo
+  flags_section_from = lambda l: l.startswith('flags\t\t')
+  lines = filter(flags_section_from, [ l for l in open('/proc/cpuinfo', 'r')])
+  if len(lines) < 1: return False
+
+  instruction = ' cx16 ' if cpu_is_64bit() else ' cx8 '
+  return lines[0].find(instruction)
+
+def make_commands(args, targets):
+  binutils_define = '-D_CMAKE_TOOLCHAIN_PREFIX=llvm-' if ( args.toolchain == 'llvm' ) else ''
+  cmake_cmd = ['cmake', \
+               binutils_define, \
+               '-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=%s' % targets.bin_d, \
+               '-DCMAKE_BUILD_TYPE=%s' % targets.build_t, \
+               '-G', 'Unix Makefiles', \
+               targets.source_d \
+  ]
+  make_cmd  = ['make', ]
+  if args.verbose:
+    make_cmd.append('-v')
+  install_cmd = ['make', 'install']
+  return( cmake_cmd, make_cmd, install_cmd )
+
+def setup_env(args, env):
+  # as GCC is the default compiler supported..
+  if( args.toolchain == 'llvm' ):
+    env['CC']  = '/usr/bin/clang'
+    env['CXX'] = '/usr/bin/clang++'
+
+  return env
+
+
+def execute(command):
+  exit_status = sp.call(command)
+  return int(exit_status)
+
+def clean(args, build_d):
+  if args.clean and isdir(build_d):
+    log_debug('cleaning build dir')
+    rmtree(build_d)
+
+def remake(args, build_d):
+  if not(isdir( build_d )):
+    os.makedirs( build_d )
+
+def check_platform_support():
+  if( sys.platform != 'linux2' ):
+    log_error('unsupported platform: %s' % sys.platform)
+    sys.exit(1)
+
+def executed_in_source_dir():
+  working_d = abspath(realpath( os.curdir ))
+  parent_d = working_d.split('/')[-1]
+  return( parent_d == 'sources' )
+
+def main(argc, argv):
+  check_platform_support()
+  if not(executed_in_source_dir()):
+    log_error('please execute %s from under sources' % argv[0])
+    sys.exit( 1 )
+
+  build_d = './build'
+  args = args_of(argv[1:], build_d)
+
+  clean(args, build_d)
+  remake(args, build_d)
+
+  commands = make_commands(args, make_targets(args, build_d))
+  setup_env(args, os.environ)
+  os.chdir(build_d)
+  to_exit_status = lambda cmd: execute(cmd)
+  for exit_status in map(to_exit_status, commands):
+    if( exit_status != 0 ):
+      sys.exit( 1 )
+
+if __name__=='__main__':
+  main(len(sys.argv), sys.argv)
 

@@ -1,0 +1,59 @@
+#!/bin/python2
+'''
+Convenience tool for running the tests.
+
+Created on 2016.05.16
+@author cvirtue
+'''
+from argparse import ArgumentParser
+from os.path import realpath
+from os.path import abspath
+from os.path import isfile
+from os.path import isdir
+import subprocess as sp
+import sys
+import os
+import re
+
+
+def log_error(message): print '[error] %s' % message
+def log_info(message):  print '[info]  %s' % message
+def log_debug(message): print '[debug] %s' % message
+
+
+def no_tests_found():
+  log_info('no tests to run')
+  sys.exit(0)
+
+def no_tests_dir():
+  log_error('tests home was not found: perhaps not built')
+  sys.exit(1)
+
+
+def main(argc, argv):
+  working_d = abspath(realpath( os.curdir ))
+  parent_d  = working_d.split('/')[-1] 
+  if( parent_d != 'sources' ):
+    log_error('please execute from source dir (sources)')
+    sys.exit( 1 )
+
+  build_d = '%s/build' % working_d
+  tests_d = '%s/bin/tests' % build_d
+  if not(isdir( tests_d )):
+    no_tests_dir()
+
+  is_test = re.compile('.*_tests')
+  out_files = lambda f: isfile('/'.join(( tests_d, f ))) and is_test.match(f)
+  tests = filter(out_files, os.listdir( tests_d ))
+  if len(tests) < 1:
+    no_tests_found()
+    
+  for test in tests:
+    log_info('running %s' % test)
+    command = [ '/'.join(( tests_d, test )), ]
+    sp.call(command)
+
+
+if __name__=='__main__':
+  main(len(sys.argv), sys.argv)
+

@@ -11,8 +11,9 @@ file (GLOB __unit_tests_sources "tests/unit/*.cpp" "tests/unit/cconsole/*.cpp" "
 
 
 set (CXX_STANDARD "-std=c++14")
-#set (CXX_SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
-set (CXX_SANITIZER_FLAGS "")
+#                         -fsanitize=address
+set (CXX_SANITIZER_FLAGS "-fsanitize=thread -fno-omit-frame-pointer")
+#set (CXX_SANITIZER_FLAGS "")
 set (CXX_COMMON_FLAGS "${CXX_STANDARD} -Wall -Wextra -Wdeprecated -pedantic ${CXX_SANITIZER_FLAGS} -isystem ${BOOST_HOME}/include -isystem ${BOOGLE_TEST_HOME}/include")
 set (CMAKE_CXX_FLAGS_DEBUG   "${CXX_COMMON_FLAGS} -O0 -g3 -pg")
 set (CMAKE_CXX_FLAGS_RELEASE "${CXX_COMMON_FLAGS} -O3")
@@ -41,4 +42,7 @@ target_link_libraries (unit_tests ccmonitor gtest boost_system boost_filesystem 
 
 add_executable (simplex "tests/long_runners/simplex.cpp")
 target_link_libraries (simplex m)
+
+install (TARGETS unit_tests simplex DESTINATION "${PROJECT_BINARY_DIR}/bin/tests")
+install (TARGETS cmonitor cview DESTINATION "${PROJECT_BINARY_DIR}/bin")
 

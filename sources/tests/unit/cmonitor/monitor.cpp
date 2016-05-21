@@ -14,7 +14,8 @@ TEST(monitor, ownership) {
   {
     std::string cmdline;
     pid_t pid;
-    {
+    try {
+
       crf::proc::monitor monitor{command};
       EXPECT_TRUE(static_cast<bool>(monitor));
       EXPECT_TRUE(monitor.is_owner());
@@ -25,6 +26,11 @@ TEST(monitor, ownership) {
       EXPECT_GT(pid, 1);
       EXPECT_TRUE(crf::proc::is_alive(pid, cmdline));
       EXPECT_EQ(monitor.is_process_alive(), crf::proc::is_alive(pid, cmdline));
+
+    }
+    catch( std::exception const& e ) {
+      std::printf("[warning] unable to start %s due to getting: %s -- skipping..\n", command, e.what());
+      ASSERT_STRNE("", "");
     }
     EXPECT_FALSE(crf::proc::is_alive(pid, cmdline));
   }
@@ -35,7 +41,8 @@ TEST(monitor, ownership) {
   {
     pid = crf::proc::start(command);
     crf::proc::guard const volatile guard{pid};
-    {
+    try {
+
       crf::proc::monitor m{pid};
       EXPECT_TRUE(static_cast<bool>(m));
       EXPECT_FALSE(m.is_owner());
@@ -43,6 +50,11 @@ TEST(monitor, ownership) {
       cmdline = m.cmdline();
       EXPECT_GT(pid, 1);
       EXPECT_EQ(m.is_process_alive(), crf::proc::is_alive(pid, cmdline));
+
+    }
+    catch( std::exception const& e ) {
+      std::printf("[warning] unable to monitor %d due to getting: %s -- skipping..\n", pid, e.what());
+      ASSERT_STRNE("", "");
     }
     EXPECT_TRUE(crf::proc::is_alive(pid, cmdline));
   }
@@ -55,21 +67,21 @@ static inline void __log(crf::proc::monitor::sample_t const& sample) noexcept {
   std::printf("\n");
   std::printf("pid:    %d\n",   sample.pid);
   std::printf("usage:  %f %\n", sample.cpu_usage);
-  std::printf("utime:  %d\n",   sample.utime);
-  std::printf("stime:  %d\n",   sample.stime);
-  std::printf("VmRSS:  %d\n",   sample.vm_rss);
-  std::printf("VmSize: %d\n",   sample.vm_size);
-  std::printf("VmPeak: %d\n",   sample.vm_peak);
+  std::printf("utime:  %zu\n",  sample.utime);
+  std::printf("stime:  %zu\n",  sample.stime);
+  std::printf("VmRSS:  %zu\n",  sample.vm_rss);
+  std::printf("VmSize: %zu\n",  sample.vm_size);
+  std::printf("VmPeak: %zu\n",  sample.vm_peak);
 }
 } // namespace debug
 
-TEST(monitor, samping) {
+TEST(monitor, sampling) {
   auto const command  = "./build/build/bin/simplex";
   auto const interval = std::chrono::milliseconds{21};
-  {
+  try {
+
     crf::proc::monitor m{command};
     EXPECT_TRUE(m.is_process_alive());
-
     auto attempt = 130;
     auto sample = crf::proc::monitor::sample_t{};
     do {
@@ -84,6 +96,11 @@ TEST(monitor, samping) {
       std::this_thread::sleep_for(interval);
     }
     while( --attempt > 0 );
+
+  }
+  catch( std::exception const& e ) {
+    std::printf("[warning] unable to start %s due to getting: %s -- skipping..\n", command, e.what());
+    ASSERT_STRNE("", "");
   }
 }
 
