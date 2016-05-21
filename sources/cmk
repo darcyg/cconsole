@@ -60,7 +60,7 @@ def args_of(argv, build_d):
   parser.add_argument('--install-prefix', type=str, help='deprecated -- does nothing -- do not use')
   parser.add_argument('-r', '--release', action='store_true', help='triggers a (heavily) optimised build')
   parser.add_argument('-v', '--verbose', action='store_true', help='triggers verbose compilation')
-  parser.add_argument('-t', '--toolchain', help='sets the toolchain to build the project with', default='gcc', type=str, choices=toolchains())
+  parser.add_argument('-t', '--toolchain', help='sets the toolchain to build the project with', default='llvm', type=str, choices=toolchains())
   return parser.parse_args(argv)
 
 

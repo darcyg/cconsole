@@ -29,6 +29,11 @@ def no_tests_dir():
   log_error('tests home was not found: perhaps not built')
   sys.exit(1)
 
+def args_of(argv):
+  parser = ArgumentParser()
+  parser.add_argument('-r', '--run',    type=str, help='the test binary to run')
+  parser.add_argument('-f', '--filter', type=str, help='the filter string to pass to the test binary or binaries')
+  return parser.parse_args(argv)
 
 def main(argc, argv):
   working_d = abspath(realpath( os.curdir ))
@@ -37,13 +42,18 @@ def main(argc, argv):
     log_error('please execute from source dir (sources)')
     sys.exit( 1 )
 
+  args = args_of(argv[1:])
   build_d = '%s/build' % working_d
   tests_d = '%s/bin/tests' % build_d
   if not(isdir( tests_d )):
     no_tests_dir()
 
   is_test = re.compile('.*_tests')
-  out_files = lambda f: isfile('/'.join(( tests_d, f ))) and is_test.match(f)
+  if not args.run:
+    out_files = lambda f: isfile('/'.join(( tests_d, f ))) and is_test.match(f)
+  else:
+    out_files = lambda f: isfile('/'.join(( tests_d, f ))) and f == args.run
+
   tests = filter(out_files, os.listdir( tests_d ))
   if len(tests) < 1:
     no_tests_found()
@@ -51,6 +61,9 @@ def main(argc, argv):
   for test in tests:
     log_info('running %s' % test)
     command = [ '/'.join(( tests_d, test )), ]
+    if args.filter:
+      command.append('--gtest_filter=%s' % args.filter);
+
     sp.call(command)
 
 
