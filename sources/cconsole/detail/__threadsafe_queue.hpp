@@ -4,6 +4,7 @@
 #include <cconsole/detail/__spinlock.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
+#include <utility>
 #include <queue>
 #include <mutex>
 
@@ -12,15 +13,15 @@ namespace crf { namespace threadsafe {
 template <typename T>
 class queue : private boost::noncopyable {
 public:
-  using queue_t = std::queue<T>;
+  using value_type = T;
+  using queue_t = std::queue<value_type>;
   using lock_t  = crf::spinlock;
   ///to comply to the standard :)
-  using value_type = typename queue_t::value_type;
 
 private:
   using guard_t = std::lock_guard<lock_t>;
 
-  value_type pop_front() noexcept(noexcept(value_type{std::declval<value_type>()})) {
+  value_type pop_front() noexcept {
     auto element = _queue.front();
     _queue.pop();
     return element;
@@ -29,12 +30,17 @@ private:
 public:
   queue() = default;
 
-  void push(T const& element) noexcept(noexcept(this->pop_front())) {
+  void push(T const& element) {
     guard_t g{_lock};
     _queue.push(element);
   }
 
-  boost::optional<value_type> pop() noexcept(noexcept(this->pop_front())) {
+  void emplace(T && element) {
+    guard_t g{_lock};
+    _queue.emplace(std::move(element));
+  }
+
+  boost::optional<value_type> pop() noexcept {
     {
       guard_t g{_lock};
       if (not _queue.empty())

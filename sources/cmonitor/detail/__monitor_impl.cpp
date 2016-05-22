@@ -39,9 +39,9 @@ boost::format monitor::__descriptor::_proc_stat_file_format   = boost::format{"%
 crf::proc::monitor::__descriptor::__descriptor(pid_t pid_, std::string cmdline_)
 : pid{pid_}
 , cmdline{std::move(cmdline_)}
-, proc_path{std::move(( _proc_path_format % pid ).str())}
-, proc_stat_path{std::move(( _proc_stat_file_format % proc_path ).str())}
-, proc_status_path{std::move(( _proc_status_file_format % proc_path ).str())}
+, proc_path{( _proc_path_format % pid ).str()}
+, proc_stat_path{( _proc_stat_file_format % proc_path ).str()}
+, proc_status_path{( _proc_status_file_format % proc_path ).str()}
 {
 }
 

@@ -24,7 +24,7 @@ add_definitions (-DBOOST_ALL_DYN_LINK)
 include_directories ("${GOOGLE_TEST_HOME}/include")
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${BOOST_HOME}/include")
-#add_subdirectory (cconsole)
+add_subdirectory (cconsole)
 add_subdirectory (cmonitor/detail)
 
 link_directories ("${GOOGLE_TEST_HOME}/lib")
@@ -32,13 +32,13 @@ link_directories ("${BOOST_HOME}/lib")
 
 
 add_executable (cview ${__cview_sources})
-#target_link_libraries (cview cconsole)
+target_link_libraries (cview cconsole)
 
 add_executable (cmonitor  ${__cmonitor_sources})
-target_link_libraries (cmonitor ccmonitor boost_system boost_filesystem pthread)
+target_link_libraries (cmonitor ccmonitor cconsole boost_system boost_filesystem pthread)
 
 add_executable (unit_tests ${__unit_tests_sources})
-target_link_libraries (unit_tests ccmonitor gtest boost_system boost_filesystem pthread)
+target_link_libraries (unit_tests ccmonitor cconsole gtest boost_system boost_filesystem pthread)
 
 add_executable (simplex "tests/long_runners/simplex.cpp")
 target_link_libraries (simplex m)

@@ -22,7 +22,7 @@ private:
 
 
 constexpr crf::spinlock::spinlock() noexcept
-: _locked{ATOMIC_FLAG_INIT}
+: _locked(ATOMIC_FLAG_INIT)
 {
 }
 

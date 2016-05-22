@@ -31,8 +31,8 @@ def no_tests_dir():
 
 def args_of(argv):
   parser = ArgumentParser()
-  parser.add_argument('-r', '--run',    type=str, help='the test binary to run')
-  parser.add_argument('-f', '--filter', type=str, help='the filter string to pass to the test binary or binaries')
+  parser.add_argument('-r', '--run',  type=str, help='the test binary to run')
+  parser.add_argument('--only',       type=str, help='only test-cases matching the pattern given will be run')
   return parser.parse_args(argv)
 
 def main(argc, argv):
@@ -61,8 +61,8 @@ def main(argc, argv):
   for test in tests:
     log_info('running %s' % test)
     command = [ '/'.join(( tests_d, test )), ]
-    if args.filter:
-      command.append('--gtest_filter=%s' % args.filter);
+    if args.only:
+      command.append('--gtest_filter=%s' % args.only);
 
     sp.call(command)
 

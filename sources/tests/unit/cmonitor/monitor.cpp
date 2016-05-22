@@ -62,18 +62,20 @@ TEST(monitor, ownership) {
 }
 
 
+/*
 namespace debug {
 static inline void __log(crf::proc::monitor::sample_t const& sample) noexcept {
   std::printf("\n");
-  std::printf("pid:    %d\n",   sample.pid);
-  std::printf("usage:  %f %\n", sample.cpu_usage);
-  std::printf("utime:  %zu\n",  sample.utime);
-  std::printf("stime:  %zu\n",  sample.stime);
-  std::printf("VmRSS:  %zu\n",  sample.vm_rss);
-  std::printf("VmSize: %zu\n",  sample.vm_size);
-  std::printf("VmPeak: %zu\n",  sample.vm_peak);
+  std::printf("pid:    %d\n",  sample.pid);
+  std::printf("usage:  %f\n",  sample.cpu_usage);
+  std::printf("utime:  %zu\n", sample.utime);
+  std::printf("stime:  %zu\n", sample.stime);
+  std::printf("VmRSS:  %zu\n", sample.vm_rss);
+  std::printf("VmSize: %zu\n", sample.vm_size);
+  std::printf("VmPeak: %zu\n", sample.vm_peak);
 }
 } // namespace debug
+*/
 
 TEST(monitor, sampling) {
   auto const command  = "./build/build/bin/simplex";
